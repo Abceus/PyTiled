@@ -213,12 +213,12 @@ class Game:
         self.map_.draw(self.surface, dt)
 
         # render text
-        label = myfont.render(str(self.points), 1, (255,255,0))
-        surface.blit(label, (0, 0))
+        label = myfont.render(str(self.points), 1, (255,0,0))
+        self.surface.blit(label, (0, 0))
 
         if self.game_over:
-            label = myfont.render("Game over", 1, (255,255,0))
-            surface.blit(label, (100, 100))
+            label = myfont.render("Game over", 1, (255,0,0))
+            self.surface.blit(label, (100, 100))
 
         s = pygame.transform.scale(self.surface, surface.get_size())
         surface.blit(s, (0,0))
