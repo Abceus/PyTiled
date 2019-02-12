@@ -229,6 +229,7 @@
  <tile id="45">
   <properties>
    <property name="class_" value="Food"/>
+   <property name="group" value="foods"/>
   </properties>
  </tile>
  <tile id="46">
@@ -239,6 +240,7 @@
  <tile id="47">
   <properties>
    <property name="class_" value="Food"/>
+   <property name="group" value="foods"/>
    <property name="points" type="int" value="2000"/>
   </properties>
  </tile>

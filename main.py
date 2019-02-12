@@ -27,7 +27,8 @@ def main():
     spec = importlib.util.spec_from_file_location("game", os.path.join(project_working_dir, "init.py"))
     plugin = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(plugin)
-    PyTiledClasses.PROJECT_PATH = project_working_dir
+    PyTiledClasses.Project.get_instance().path = project_working_dir
+    PyTiledClasses.Project.get_instance().module = plugin
 
     pygame.init()
 
@@ -51,14 +52,15 @@ def main():
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYUP:
+                player = game.map_.get_group("player")
                 if event.key == pygame.K_LEFT:
-                    game.map_.player.change_direction("left")
+                    player.change_direction("left")
                 elif event.key == pygame.K_RIGHT:
-                    game.map_.player.change_direction("right")
+                    player.change_direction("right")
                 elif event.key == pygame.K_UP:
-                    game.map_.player.change_direction("up")
+                    player.change_direction("up")
                 elif event.key == pygame.K_DOWN:
-                    game.map_.player.change_direction("down")
+                    player.change_direction("down")
 
         surface.fill((255, 255, 255))
         game.update(time.clock() - prev_time)

@@ -6,7 +6,27 @@ import inspect
 import os
 
 
-PROJECT_PATH = ""
+class Project:
+    __instance = None
+
+    @staticmethod
+    def get_instance():
+        """ Static access method. """
+        if Project.__instance is None:
+            Project()
+        return Project.__instance
+
+    def __init__(self):
+        """ Virtually private constructor. """
+        if Project.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            Project.__instance = self
+            self.path = ""
+            self.module = None
+
+# PROJECT_PATH = ""
+# PROJECT_MODULE = None
 
 
 class Animation:
@@ -25,7 +45,6 @@ class Animation:
     def update_image(self, dt):
         self.dt += dt
         self.dt %= sum([self.frames[i] for i in range(len(self.frames)) if i % 2 == 1])
-        # print(sum([self.frames[i] for i in range(len(self.frames)) if i%2==1]))
         tmp = 0
         i = 1
         while self.dt > tmp and i < len(self.frames):
@@ -44,7 +63,7 @@ class MapObject:
         self.image = image
         self.hidden = hidden
 
-    def draw(self, surface, tile_width, tile_height, dt, offset=(0,0), rotate=0):
+    def draw(self, surface, tile_width, tile_height, dt, offset=(0, 0), rotate=0):
         if type(self.image) == Animation:
             self.image.update_image(dt)
             self.image.image = pygame.transform.rotate(self.image.image, rotate)
@@ -57,12 +76,12 @@ class MapObject:
 class Map:
     def __init__(self, filename):
 
-        self.foods = []
-        self.ghosts = []
+        # self.foods = []
+        # self.ghosts = []
         self.layers = []
+        self.groups = {}
 
-        print(os.path.join(PROJECT_PATH, "maps", filename + ".tmx"))
-        map_ = tmx.TileMap.load(os.path.join(PROJECT_PATH, "maps", filename + ".tmx"))
+        map_ = tmx.TileMap.load(os.path.join(Project.get_instance().path, "maps", filename + ".tmx"))
         # map_ = tmx.TileMap.load(PROJECT_PATH + "maps/" + filename + ".tmx")
 
         # self.name = filename
@@ -82,8 +101,8 @@ class Map:
             start = image_path.rfind("/")
             image_path = image_path[start:]
             # TODO: os.join
-            impath = os.path.join(PROJECT_PATH, "data/images")
-            image = pygame.image.load(os.path.join(PROJECT_PATH, "data/images", image_path[1:]))
+            impath = os.path.join(Project.get_instance().path, "data/images")
+            image = pygame.image.load(os.path.join(Project.get_instance().path, "data/images", image_path[1:]))
             spacing_ = ts.spacing
             margin = ts.margin
             tilewidth = ts.tilewidth
@@ -109,14 +128,16 @@ class Map:
                 #    im = renpy.display.anim.TransitionAnimation(*frames)
 
                 properties = []
-                class_name = "MapObject"
+                class_ = getattr(sys.modules[__name__], "MapObject")
                 for tile in ts.tiles:
                     if tile.id == i:
                         properties = tile.properties
                 for p in properties:
-                    if p.name == "class_" and hasattr(sys.modules[__name__], p.value):
-                        class_name = p.value
-                class_ = getattr(sys.modules[__name__], class_name)
+                    if p.name == "class_":
+                        if hasattr(sys.modules[__name__], p.value):
+                            class_ = getattr(sys.modules[__name__], p.value)
+                        elif Project.get_instance().module and hasattr(Project.get_instance().module, p.value):
+                            class_ = getattr(Project.get_instance().module, p.value)
                 class_args = inspect.getfullargspec(class_).args
                 cl_args = {}
                 for p in properties:
@@ -141,13 +162,18 @@ class Map:
                         new_object = copy.copy(self.tiles[layer.tiles[i].gid])
                         new_object.x = x
                         new_object.y = y
-                        # print(type(new_object), isinstance(new_object, Food))
-                        if isinstance(new_object, Food):
-                            self.foods.append(new_object)
-                        elif isinstance(new_object, Pacman):
-                            self.player = new_object
-                        elif isinstance(new_object, Ghost):
-                            self.ghosts.append(new_object)
+                        if hasattr(new_object, "group") and new_object.group:
+                            group = self.groups.get(new_object.group, None)
+                            if group:
+                                if isinstance(group, list):
+                                    group.append(new_object)
+                                else:
+                                    old_group = group
+                                    self.groups[new_object.group] = []
+                                    self.groups[new_object.group].append(old_group)
+                                    self.groups[new_object.group].append(new_object)
+                            else:
+                                self.groups[new_object.group] = new_object
             else:
                 self.layers.append([])
                 for i in range(len(layer.tiles)):
@@ -164,13 +190,23 @@ class Map:
                     o.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt,
                            offset=(oi * self.tile_height, rowi * self.tile_width))
 
-        for g in self.ghosts:
-            g.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+        for group_key, group_value in self.groups.items():
+            if isinstance(group_value, list):
+                for item in group_value:
+                    item.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+            else:
+                group_value.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
 
-        for f in self.foods:
-            f.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
-
-        self.player.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt,
-                            offset=(-self.player.image.frames[0].get_size()[0] / 4,
-                                    -self.player.image.frames[0].get_size()[1] / 4))
+        # for g in self.ghosts:
+        #     g.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+        #
+        # for f in self.foods:
+        #     f.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+        #
+        # self.player.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt,
+        #                     offset=(-self.player.image.frames[0].get_size()[0] / 4,
+        #                             -self.player.image.frames[0].get_size()[1] / 4))
         # self.player.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+
+    def get_group(self, key):
+        return self.groups.get(key, None)

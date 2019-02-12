@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset name="main" tilewidth="8" tileheight="8" spacing="1" margin="1" tilecount="48" columns="16">
- <image source="../data/images/Arcade - Pac-Man - Maze Parts.png" width="144" height="27"/>
+ <image source="../../../data/images/Arcade - Pac-Man - Maze Parts.png" width="144" height="27"/>
  <tile id="0">
   <properties>
    <property name="wall" type="bool" value="true"/>
@@ -228,17 +228,20 @@
  </tile>
  <tile id="45">
   <properties>
-   <property name="class_" value="food"/>
+   <property name="class_" value="Food"/>
+   <property name="group" value="foods"/>
   </properties>
  </tile>
  <tile id="46">
   <properties>
-   <property name="class_" value="pacman_wall"/>
+   <property name="class_" value="Pacman_wall"/>
   </properties>
  </tile>
  <tile id="47">
   <properties>
-   <property name="class_" value="big_food"/>
+   <property name="class_" value="Food"/>
+   <property name="group" value="foods"/>
+   <property name="points" type="int" value="2000"/>
   </properties>
  </tile>
 </tileset>

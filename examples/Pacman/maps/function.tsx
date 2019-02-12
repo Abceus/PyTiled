@@ -12,6 +12,7 @@
  <tile id="1">
   <properties>
    <property name="class_" value="Pacman"/>
+   <property name="group" value="player"/>
   </properties>
  </tile>
  <tile id="56">

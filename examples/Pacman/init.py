@@ -55,7 +55,7 @@ class Game:
         self.points += value
 
     def draw(self, surface, dt):
-        self.surface.fill((255,255,255))
+        self.surface.fill((255, 255, 255))
         myfont = pygame.font.SysFont("monospace", 15)
 
         self.map_.draw(self.surface, dt)
@@ -73,42 +73,44 @@ class Game:
 
     def update(self, dt):
         # self.map_.player.update(dt)
+        player = self.map_.get_group("player")
+        foods = self.map_.get_group("foods")
         if not self.game_over:
             dirs = {"right": (1, 0), "up": (0, -1), "left": (-1, 0), "down": (0, 1)}
-            self.map_.player.prev_time += dt
-            if self.map_.player.prev_time >= self.map_.player.speed:
+            player.prev_time += dt
+            if player.prev_time >= player.speed:
                 next_direction_free = True
                 for layer in self.map_.layers:
-                    next_direction_x = self.map_.player.x + dirs[self.map_.player.next_direction][0]
-                    next_direction_y = self.map_.player.y + dirs[self.map_.player.next_direction][1]
+                    next_direction_x = player.x + dirs[player.next_direction][0]
+                    next_direction_y = player.y + dirs[player.next_direction][1]
                     next_direction_tile = layer[next_direction_y][next_direction_x]
                     if hasattr(next_direction_tile, "wall") and next_direction_tile.wall:
                         next_direction_free = False
                         break
                 if next_direction_free:
-                    self.map_.player.direction = self.map_.player.next_direction
+                    player.direction = player.next_direction
 
                 next_tile_free = True
                 for layer in self.map_.layers:
-                    next_tile_x = self.map_.player.x + dirs[self.map_.player.direction][0]
-                    next_tile_y = self.map_.player.y + dirs[self.map_.player.direction][1]
+                    next_tile_x = player.x + dirs[player.direction][0]
+                    next_tile_y = player.y + dirs[player.direction][1]
                     next_tile = layer[next_tile_y][next_tile_x]
                     if hasattr(next_tile, "wall") and next_tile.wall:
                         next_tile_free = False
                         break
 
                 if next_tile_free:
-                    self.map_.player.x += dirs[self.map_.player.direction][0]
-                    self.map_.player.y += dirs[self.map_.player.direction][1]
+                    player.x += dirs[player.direction][0]
+                    player.y += dirs[player.direction][1]
                     # self.map_.player.prev_time %= self.map_.player.speed
-                    self.map_.player.prev_time = 0
+                    player.prev_time = 0
 
-                for f in self.map_.foods:
-                    if f.x == self.map_.player.x and f.y == self.map_.player.y:
+                for f in foods:
+                    if f.x == player.x and f.y == player.y:
                         self.points += f.points
-                        self.map_.foods.remove(f)
+                        foods.remove(f)
 
-            if not self.map_.foods:
+            if not foods:
                 self.game_over = True
 
 
@@ -142,12 +144,12 @@ class Food(MapObject):
 
 
 def load_tile(name, id_=0):
-    tree = xml.etree.ElementTree.parse("maps/" + name + ".tsx")
+    tree = xml.etree.ElementTree.parse(os.path.join(Project.get_instance().path, "maps", name + ".tsx"))
     image_path = tree._root[1].attrib["source"]
     image_path = image_path.replace("\\", "/")
     start = image_path.rfind("/")
     image_path = image_path[start:]
-    image = pygame.image.load("data/images" + image_path)
+    image = pygame.image.load(os.path.join(Project.get_instance().path, "data", "images", image_path[1:]))
     spacing_ = int(tree._root.attrib.get("spacing", 0))
     margin = int(tree._root.attrib.get("margin", 0))
     tilewidth = int(tree._root.attrib["tilewidth"])
