@@ -108,7 +108,8 @@ class Game:
                 for f in foods:
                     if f.x == player.x and f.y == player.y:
                         self.points += f.points
-                        foods.remove(f)
+                        self.map_.destroy_object(f)
+                        # foods.remove(f)
 
             if not foods:
                 self.game_over = True

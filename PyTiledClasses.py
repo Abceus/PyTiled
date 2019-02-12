@@ -80,6 +80,7 @@ class Map:
         # self.ghosts = []
         self.layers = []
         self.groups = {}
+        self.objects = []
 
         map_ = tmx.TileMap.load(os.path.join(Project.get_instance().path, "maps", filename + ".tmx"))
         # map_ = tmx.TileMap.load(PROJECT_PATH + "maps/" + filename + ".tmx")
@@ -162,6 +163,7 @@ class Map:
                         new_object = copy.copy(self.tiles[layer.tiles[i].gid])
                         new_object.x = x
                         new_object.y = y
+                        self.objects.append(new_object)
                         if hasattr(new_object, "group") and new_object.group:
                             group = self.groups.get(new_object.group, None)
                             if group:
@@ -189,13 +191,14 @@ class Map:
                     o = row[oi]
                     o.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt,
                            offset=(oi * self.tile_height, rowi * self.tile_width))
-
-        for group_key, group_value in self.groups.items():
-            if isinstance(group_value, list):
-                for item in group_value:
-                    item.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
-            else:
-                group_value.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+        for object in self.objects:
+            object.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+        # for group_key, group_value in self.groups.items():
+        #     if isinstance(group_value, list):
+        #         for item in group_value:
+        #             item.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+        #     else:
+        #         group_value.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
 
         # for g in self.ghosts:
         #     g.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
@@ -210,3 +213,11 @@ class Map:
 
     def get_group(self, key):
         return self.groups.get(key, None)
+
+    def destroy_object(self, object):
+        self.objects.remove(object)
+        for group_key, group_value in self.groups.items():
+            if isinstance(group_value, list):
+                group_value.remove(object)
+            elif self.groups[group_key] == object:
+                self.groups[group_key] = None
