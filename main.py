@@ -22,7 +22,7 @@ class Animation:
 
     def update_image(self, dt):
         self.dt += dt
-        self.dt %= sum([self.frames[i] for i in range(len(self.frames)) if i%2==1])
+        self.dt %= sum([self.frames[i] for i in range(len(self.frames)) if i % 2 == 1])
         # print(sum([self.frames[i] for i in range(len(self.frames)) if i%2==1]))
         tmp = 0
         i = 1
@@ -158,7 +158,7 @@ class Map:
                     if p.name in class_args:
                         cl_args[p.name] = p.value
 
-                t = class_(image=im, width=tilewidth, height=tileheight, properties=properties, **cl_args)
+                t = class_(image=im, properties=properties, **cl_args)
                 self.tiles.append(t)
 
         for layer in map_.layers:
