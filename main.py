@@ -245,12 +245,27 @@ class Game:
             dirs = {"right": (1, 0), "up": (0, -1), "left": (-1, 0), "down": (0, 1)}
             self.map_.player.prev_time += dt
             if self.map_.player.prev_time >= self.map_.player.speed:
-                # wtf
-                if not [x for x in self.map_.layers if hasattr(x[self.map_.player.y+dirs[self.map_.player.next_direction][1]][self.map_.player.x+dirs[self.map_.player.next_direction][0]], "wall") and
-                                                    x[self.map_.player.y+dirs[self.map_.player.next_direction][1]][self.map_.player.x+dirs[self.map_.player.next_direction][0]].wall]:
+                next_direction_free = True
+                for layer in self.map_.layers:
+                    next_direction_x = self.map_.player.x + dirs[self.map_.player.next_direction][0]
+                    next_direction_y = self.map_.player.y + dirs[self.map_.player.next_direction][1]
+                    next_direction_tile = layer[next_direction_y][next_direction_x]
+                    if hasattr(next_direction_tile, "wall") and next_direction_tile.wall:
+                        next_direction_free = False
+                        break
+                if next_direction_free:
                     self.map_.player.direction = self.map_.player.next_direction
-                if not [x for x in self.map_.layers if hasattr(x[self.map_.player.y+dirs[self.map_.player.direction][1]][self.map_.player.x+dirs[self.map_.player.direction][0]], "wall") and
-                                                    x[self.map_.player.y+dirs[self.map_.player.direction][1]][self.map_.player.x+dirs[self.map_.player.direction][0]].wall]:
+
+                next_tile_free = True
+                for layer in self.map_.layers:
+                    next_tile_x = self.map_.player.x + dirs[self.map_.player.direction][0]
+                    next_tile_y = self.map_.player.y + dirs[self.map_.player.direction][1]
+                    next_tile = layer[next_tile_y][next_tile_x]
+                    if hasattr(next_tile, "wall") and next_tile.wall:
+                        next_tile_free = False
+                        break
+
+                if next_tile_free:
                     self.map_.player.x += dirs[self.map_.player.direction][0]
                     self.map_.player.y += dirs[self.map_.player.direction][1]
                     # self.map_.player.prev_time %= self.map_.player.speed
@@ -294,7 +309,7 @@ class Food(MapObject):
         game.remove_food(self)
 
 
-def load_tile(name, id=0):
+def load_tile(name, id_=0):
     tree = xml.etree.ElementTree.parse("maps/" + name + ".tsx")
     image_path = tree._root[1].attrib["source"]
     image_path = image_path.replace("\\", "/")
@@ -307,7 +322,7 @@ def load_tile(name, id=0):
     tileheight = int(tree._root.attrib["tileheight"])
     columns = int(tree._root.attrib["columns"])
     for element in tree._root:
-        if element.tag == "tile" and int(element.attrib["id"]) == id:
+        if element.tag == "tile" and int(element.attrib["id"]) == id_:
             animation = False
             for element2 in element:
                 if element2.tag == "animation":
@@ -327,8 +342,8 @@ def load_tile(name, id=0):
                 # if not loop:
                 #    frames = frames[:-2]
                 return Animation(frames)
-    im = pygame.Surface.subsurface(image, ((id % columns) * (tilewidth + spacing_) + spacing_,
-                                           (id // columns) * (tileheight + margin) + margin, tilewidth, tileheight))
+    im = pygame.Surface.subsurface(image, ((id_ % columns) * (tilewidth + spacing_) + spacing_,
+                                           (id_ // columns) * (tileheight + margin) + margin, tilewidth, tileheight))
     return im
 
 
