@@ -4,41 +4,39 @@ import tmx
 import copy
 import inspect
 import time
-import xml.etree.ElementTree as elementtree
+import xml.etree
 
-class Animation():
-    def __init__(self, frames=[]):
-        self.frames = frames
+
+class Animation:
+    def __init__(self, frames=None):
+        self.frames = frames if frames else []
         self.image = frames[-2]
         self.dt = 0
-        #self.repeat = (len(times) == len(images))
+        # self.repeat = (len(times) == len(images))
 
-    def scale(self, time):
-        s = sum([self.frames[i] for i in range(len(self.frames)) if i%2==1])
+    def scale(self, time_):
+        s = sum([self.frames[i] for i in range(len(self.frames)) if i % 2 == 1])
         for fi in range(len(self.frames)):
             if fi%2 == 1:
-                self.frames[fi] = self.frames[fi]/s*time
-
+                self.frames[fi] = self.frames[fi]/s*time_
 
     def update_image(self, dt):
         self.dt += dt
         self.dt %= sum([self.frames[i] for i in range(len(self.frames)) if i%2==1])
-        #print(sum([self.frames[i] for i in range(len(self.frames)) if i%2==1]))
+        # print(sum([self.frames[i] for i in range(len(self.frames)) if i%2==1]))
         tmp = 0
         i = 1
         while self.dt > tmp and i < len(self.frames):
             tmp += self.frames[i]
             i += 2
-
-        #print(i, tmp, self.dt)
-        #print(self.frames)
         self.image = self.frames[i-3]
 
 
 class MapObject:
-    def __init__(self, x=0, y=0, image=None, hidden=False, width=0, height=0, properties=[]):
-        for property_ in properties:
-            setattr(self, property_.name, property_.value)
+    def __init__(self, x=0, y=0, image=None, hidden=False, properties=None):
+        if properties:
+            for property_ in properties:
+                setattr(self, property_.name, property_.value)
         self.x = x
         self.y = y
         self.image = image
@@ -48,30 +46,39 @@ class MapObject:
         if type(self.image) == Animation:
             self.image.update_image(dt)
             self.image.image = pygame.transform.rotate(self.image.image, rotate)
-            surface.blit(self.image.image, (self.x*tile_width+offset[0]-tile_width/2, self.y*tile_height+offset[1]-tile_width/2))
+            surface.blit(self.image.image, (self.x*tile_width+offset[0]-tile_width/2,
+                                            self.y*tile_height+offset[1]-tile_width/2))
         else:
-            surface.blit(self.image, (self.x*tile_width+offset[0]-tile_width/2, self.y*tile_height+offset[1]-tile_width/2))
+            surface.blit(self.image, (self.x*tile_width+offset[0]-tile_width/2,
+                                      self.y*tile_height+offset[1]-tile_width/2))
+
 
 class Ghost(MapObject):
     def __init__(self, *args, **akws):
         super(Ghost, self).__init__(*args, **akws)
 
+
 class Blinky(Ghost):
     def __init__(self, *args, **akws):
         super(Blinky, self).__init__(*args, **akws)
+
 
 class Pinky(Ghost):
     def __init__(self, *args, **akws):
         super(Pinky, self).__init__(*args, **akws)
 
+
 class Inky(Ghost):
     def __init__(self, *args, **akws):
         super(Inky, self).__init__(*args, **akws)
 
+
 class Clyde(Ghost):
     def __init__(self, *args, **akws):
         super(Clyde, self).__init__(*args, **akws)
-#class Layer:
+
+
+# class Layer:
 #    def __init__(self, objects=[[]], hidden=False):
 #        self.objects = objects
 #        self.hidden = hidden
@@ -79,10 +86,12 @@ class Clyde(Ghost):
 #    def draw(self, surface):
 #        pass
 
-class Teleport(MapObject):
-    def touch(self, insta):
-        insta.x = self.port_x
-        insta.y = self.port_y
+
+# class Teleport(MapObject):
+#     def touch(self, insta):
+#         insta.x = self.port_x
+#         insta.y = self.port_y
+
 
 class Map:
     def __init__(self, filename):
@@ -93,7 +102,7 @@ class Map:
 
         map_ = tmx.TileMap.load("maps/" + filename + ".tmx")
 
-        #self.name = filename
+        # self.name = filename
         self.map_width = map_.width
         self.map_height = map_.height
         self.tile_width = map_.tilewidth
@@ -106,26 +115,29 @@ class Map:
         self.tiles.append(empty_object)
 
         for ts in map_.tilesets:
-            imagePath = ts.image.source.replace("\\", "/")
-            start = imagePath.rfind("/")
-            imagePath = imagePath[start:]
+            image_path = ts.image.source.replace("\\", "/")
+            start = image_path.rfind("/")
+            image_path = image_path[start:]
             # TODO: os.join
-            image = pygame.image.load("./data/images" + imagePath)
+            image = pygame.image.load("./data/images" + image_path)
             spacing_ = ts.spacing
             margin = ts.margin
             tilewidth = ts.tilewidth
             tileheight = ts.tileheight
             columns = ts.columns
             for i in range(ts.tilecount):
+                im = None
                 if i >= len(ts.tiles) or ts.tiles[i].animation is None:
-                    im = pygame.Surface.subsurface(image, ((i % columns) * (tilewidth + spacing_) + spacing_,\
-                                                            (i // columns) * (tileheight + margin) + margin, \
-                                                            tilewidth, tileheight))
-                #else:
+                    im = pygame.Surface.subsurface(image, ((i % columns) * (tilewidth + spacing_) + spacing_,
+                                                           (i // columns) * (tileheight + margin) + margin,
+                                                           tilewidth, tileheight))
+                else:
+                    pass
                 #    frames = []
                 #    for f in ts.tiles[i].animation:
                 #        frames.append(renpy.display.transform.Transform(child=image, \
-                #                        crop = ((f.tileid % columns) * (tilewidth + spacing_) + spacing_, (f.tileid // columns) * (tileheight + margin) + margin, \
+                #                        crop = ((f.tileid % columns) * (tilewidth + spacing_) + spacing_,
+                #                        (f.tileid // columns) * (tileheight + margin) + margin, \
                 #                        tilewidth, tileheight)))
                 #        frames.append(f.duration/1000.0)
                 #        frames.append(None)
@@ -140,7 +152,7 @@ class Map:
                     if p.name == "class_" and hasattr(sys.modules[__name__], p.value):
                         class_name = p.value
                 class_ = getattr(sys.modules[__name__], class_name)
-                class_args = inspect.getargspec(class_).args
+                class_args = inspect.getfullargspec(class_).args
                 cl_args = {}
                 for p in properties:
                     if p.name in class_args:
@@ -164,7 +176,7 @@ class Map:
                         new_object = copy.copy(self.tiles[layer.tiles[i].gid])
                         new_object.x = x
                         new_object.y = y
-                        #print(type(new_object), isinstance(new_object, Food))
+                        # print(type(new_object), isinstance(new_object, Food))
                         if isinstance(new_object, Food):
                             self.foods.append(new_object)
                         elif isinstance(new_object, Pacman):
@@ -184,8 +196,8 @@ class Map:
                 row = layer[rowi]
                 for oi in range(len(row)):
                     o = row[oi]
-                    o.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt, \
-                            offset=(oi*self.tile_height, rowi*self.tile_width))
+                    o.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt,
+                           offset=(oi*self.tile_height, rowi*self.tile_width))
 
         for g in self.ghosts:
             g.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
@@ -193,14 +205,18 @@ class Map:
         for f in self.foods:
             f.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
 
-        self.player.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt, offset=(-self.player.image.frames[0].get_size()[0]/4, -self.player.image.frames[0].get_size()[1]/4))
-        #self.player.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+        self.player.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt,
+                         offset=(-self.player.image.frames[0].get_size()[0]/4,
+                                 -self.player.image.frames[0].get_size()[1]/4))
+        # self.player.draw(surface, tile_width=self.tile_width, tile_height=self.tile_height, dt=dt)
+
 
 class Game:
     def __init__(self, mapname):
         self.points = 0
         self.map_ = Map(mapname)
-        self.surface = pygame.Surface((self.map_.tile_width*self.map_.map_width, self.map_.tile_height*self.map_.map_height))
+        self.surface = pygame.Surface((self.map_.tile_width*self.map_.map_width,
+                                       self.map_.tile_height*self.map_.map_height))
         self.game_over = False
 
     def add_point(self, value):
@@ -213,31 +229,31 @@ class Game:
         self.map_.draw(self.surface, dt)
 
         # render text
-        label = myfont.render(str(self.points), 1, (255,0,0))
+        label = myfont.render(str(self.points), 1, (255, 0, 0))
         self.surface.blit(label, (0, 0))
 
         if self.game_over:
-            label = myfont.render("Game over", 1, (255,0,0))
+            label = myfont.render("Game over", 1, (255, 0, 0))
             self.surface.blit(label, (100, 100))
 
         s = pygame.transform.scale(self.surface, surface.get_size())
-        surface.blit(s, (0,0))
-
+        surface.blit(s, (0, 0))
 
     def update(self, dt):
-        #self.map_.player.update(dt)
+        # self.map_.player.update(dt)
         if not self.game_over:
-            dirs = {"right":(1,0),"up":(0,-1),"left":(-1,0),"down":(0,1)}
+            dirs = {"right": (1, 0), "up": (0, -1), "left": (-1, 0), "down": (0, 1)}
             self.map_.player.prev_time += dt
             if self.map_.player.prev_time >= self.map_.player.speed:
-                if not [x for x in self.map_.layers if hasattr(x[self.map_.player.y+dirs[self.map_.player.next_direction][1]][self.map_.player.x+dirs[self.map_.player.next_direction][0]], "wall") and \
+                # wtf
+                if not [x for x in self.map_.layers if hasattr(x[self.map_.player.y+dirs[self.map_.player.next_direction][1]][self.map_.player.x+dirs[self.map_.player.next_direction][0]], "wall") and
                                                     x[self.map_.player.y+dirs[self.map_.player.next_direction][1]][self.map_.player.x+dirs[self.map_.player.next_direction][0]].wall]:
                     self.map_.player.direction = self.map_.player.next_direction
-                if  not [x for x in self.map_.layers if hasattr(x[self.map_.player.y+dirs[self.map_.player.direction][1]][self.map_.player.x+dirs[self.map_.player.direction][0]], "wall") and \
+                if not [x for x in self.map_.layers if hasattr(x[self.map_.player.y+dirs[self.map_.player.direction][1]][self.map_.player.x+dirs[self.map_.player.direction][0]], "wall") and
                                                     x[self.map_.player.y+dirs[self.map_.player.direction][1]][self.map_.player.x+dirs[self.map_.player.direction][0]].wall]:
                     self.map_.player.x += dirs[self.map_.player.direction][0]
                     self.map_.player.y += dirs[self.map_.player.direction][1]
-                    #self.map_.player.prev_time %= self.map_.player.speed
+                    # self.map_.player.prev_time %= self.map_.player.speed
                     self.map_.player.prev_time = 0
 
                 for f in self.map_.foods:
@@ -263,10 +279,9 @@ class Pacman(MapObject):
     def change_direction(self, value):
         self.next_direction = value
 
-    def draw(self, surface, tile_width, tile_height, dt, offset=(0,0)):
+    def draw(self, surface, tile_width, tile_height, dt, offset=(0, 0)):
         dirs = {"right":0,"up":90,"left":180,"down":270}
         super(Pacman, self).draw(surface, tile_width, tile_height, dt, offset, rotate=dirs[self.direction])
-
 
 
 class Food(MapObject):
@@ -278,8 +293,9 @@ class Food(MapObject):
         game.add_point(self.points)
         game.remove_food(self)
 
+
 def load_tile(name, id=0):
-    tree = elementtree.parse("maps/" + name + ".tsx")
+    tree = xml.etree.ElementTree.parse("maps/" + name + ".tsx")
     image_path = tree._root[1].attrib["source"]
     image_path = image_path.replace("\\", "/")
     start = image_path.rfind("/")
@@ -300,33 +316,37 @@ def load_tile(name, id=0):
             if animation:
                 frames = []
                 for f in animation_element:
-                    frames.append(pygame.Surface.subsurface(image, (int(f.attrib["tileid"]) % columns) * (tilewidth + spacing_) + spacing_, (int(f.attrib["tileid"]) // columns) * (tileheight + margin) + margin, \
-                                    tilewidth, tileheight))
+                    frames.append(pygame.Surface.subsurface(image,
+                                                            (int(f.attrib["tileid"]) % columns) *
+                                                            (tilewidth + spacing_) + spacing_,
+                                                            (int(f.attrib["tileid"]) // columns) *
+                                                            (tileheight + margin) + margin,
+                                                            tilewidth, tileheight))
                     frames.append(float(f.attrib["duration"])/1000.0)
-                    #frames.append(None)
-                #if not loop:
+                    # frames.append(None)
+                # if not loop:
                 #    frames = frames[:-2]
                 return Animation(frames)
-    im = pygame.Surface.subsurface(image, ((id % columns) * (tilewidth + spacing_) + spacing_, (id // columns) * (tileheight + margin) + margin, \
-                    tilewidth, tileheight))
+    im = pygame.Surface.subsurface(image, ((id % columns) * (tilewidth + spacing_) + spacing_,
+                                           (id // columns) * (tileheight + margin) + margin, tilewidth, tileheight))
     return im
 
 
 def main():
     pygame.init()
 
-    SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
+    screen_width, screen_height = 640, 480
+    screen = pygame.display.set_mode((screen_width, screen_height), 0, 32)
     surface = pygame.Surface(screen.get_size())
     surface = surface.convert()
-    surface.fill((255,255,255))
+    surface.fill((255, 255, 255))
 
     game = Game("main")
 
     time.clock()
     prev_time = 0
 
-    #pygame.key.set_repeat(1, 40)
+    # pygame.key.set_repeat(1, 40)
 
     while True:
 
@@ -344,12 +364,11 @@ def main():
                 elif event.key == pygame.K_DOWN:
                     game.map_.player.change_direction("down")
 
-
-        surface.fill((255,255,255))
+        surface.fill((255, 255, 255))
         game.update(time.clock() - prev_time)
         game.draw(surface, time.clock() - prev_time)
         prev_time = time.clock()
-        screen.blit(surface, (0,0))
+        screen.blit(surface, (0, 0))
         pygame.display.flip()
         pygame.display.update()
 
