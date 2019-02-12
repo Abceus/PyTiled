@@ -17,7 +17,7 @@ class Animation:
     def scale(self, time_):
         s = sum([self.frames[i] for i in range(len(self.frames)) if i % 2 == 1])
         for fi in range(len(self.frames)):
-            if fi%2 == 1:
+            if fi % 2 == 1:
                 self.frames[fi] = self.frames[fi]/s*time_
 
     def update_image(self, dt):
@@ -54,28 +54,28 @@ class MapObject:
 
 
 class Ghost(MapObject):
-    def __init__(self, *args, **akws):
-        super(Ghost, self).__init__(*args, **akws)
+    def __init__(self, *args, **kwargs):
+        super(Ghost, self).__init__(*args, **kwargs)
 
 
 class Blinky(Ghost):
-    def __init__(self, *args, **akws):
-        super(Blinky, self).__init__(*args, **akws)
+    def __init__(self, *args, **kwargs):
+        super(Blinky, self).__init__(*args, **kwargs)
 
 
 class Pinky(Ghost):
-    def __init__(self, *args, **akws):
-        super(Pinky, self).__init__(*args, **akws)
+    def __init__(self, *args, **kwargs):
+        super(Pinky, self).__init__(*args, **kwargs)
 
 
 class Inky(Ghost):
-    def __init__(self, *args, **akws):
-        super(Inky, self).__init__(*args, **akws)
+    def __init__(self, *args, **kwargs):
+        super(Inky, self).__init__(*args, **kwargs)
 
 
 class Clyde(Ghost):
-    def __init__(self, *args, **akws):
-        super(Clyde, self).__init__(*args, **akws)
+    def __init__(self, *args, **kwargs):
+        super(Clyde, self).__init__(*args, **kwargs)
 
 
 # class Layer:
