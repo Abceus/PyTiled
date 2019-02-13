@@ -5,73 +5,9 @@ import copy
 import inspect
 import os
 
+from PyTiled.project import Project
+from PyTiled.mapobject import MapObject
 
-class Project:
-    __instance = None
-
-    @staticmethod
-    def get_instance():
-        """ Static access method. """
-        if Project.__instance is None:
-            Project()
-        return Project.__instance
-
-    def __init__(self):
-        """ Virtually private constructor. """
-        if Project.__instance is not None:
-            raise Exception("This class is a singleton!")
-        else:
-            Project.__instance = self
-            self.path = ""
-            self.module = None
-
-# PROJECT_PATH = ""
-# PROJECT_MODULE = None
-
-
-class Animation:
-    def __init__(self, frames=None):
-        self.frames = frames if frames else []
-        self.image = frames[-2]
-        self.dt = 0
-        # self.repeat = (len(times) == len(images))
-
-    def scale(self, time_):
-        s = sum([self.frames[i] for i in range(len(self.frames)) if i % 2 == 1])
-        for fi in range(len(self.frames)):
-            if fi % 2 == 1:
-                self.frames[fi] = self.frames[fi]/s*time_
-
-    def update_image(self, dt):
-        self.dt += dt
-        self.dt %= sum([self.frames[i] for i in range(len(self.frames)) if i % 2 == 1])
-        tmp = 0
-        i = 1
-        while self.dt > tmp and i < len(self.frames):
-            tmp += self.frames[i]
-            i += 2
-        self.image = self.frames[i-3]
-
-
-class MapObject:
-    def __init__(self, x=0, y=0, image=None, hidden=False, properties=None):
-        if properties:
-            for property_ in properties:
-                setattr(self, property_.name, property_.value)
-        self.x = x
-        self.y = y
-        self.image = image
-        self.hidden = hidden
-
-    def draw(self, surface, tile_width, tile_height, dt, offset=(0, 0), rotate=0):
-        if type(self.image) == Animation:
-            self.image.update_image(dt)
-            self.image.image = pygame.transform.rotate(self.image.image, rotate)
-            surface.blit(self.image.image, (self.x*tile_width+offset[0]-tile_width/2,
-                                            self.y*tile_height+offset[1]-tile_width/2))
-        else:
-            surface.blit(self.image, (self.x*tile_width+offset[0]-tile_width/2,
-                                      self.y*tile_height+offset[1]-tile_width/2))
 
 class Map:
     def __init__(self, filename):

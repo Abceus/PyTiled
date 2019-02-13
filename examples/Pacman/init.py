@@ -1,9 +1,11 @@
 import pygame
 import xml.etree
-from PyTiledClasses import *
+import os
+from PyTiled import *
+import PyTiled
 
 
-class Ghost(MapObject):
+class Ghost(mapobject.MapObject):
     def __init__(self, *args, **kwargs):
         super(Ghost, self).__init__(*args, **kwargs)
 
@@ -46,7 +48,7 @@ class Clyde(Ghost):
 class Game:
     def __init__(self, mapname):
         self.points = 0
-        self.map_ = Map(mapname)
+        self.map_ = map.Map(mapname)
         self.surface = pygame.Surface((self.map_.tile_width*self.map_.map_width,
                                        self.map_.tile_height*self.map_.map_height))
         self.game_over = False
@@ -115,7 +117,7 @@ class Game:
                 self.game_over = True
 
 
-class Pacman(MapObject):
+class Pacman(mapobject.MapObject):
     def __init__(self, direction="left", *args, **akws):
         super(Pacman, self).__init__(*args, **akws)
         self.direction = direction
@@ -134,7 +136,7 @@ class Pacman(MapObject):
         super(Pacman, self).draw(surface, tile_width, tile_height, dt, offset, rotate=dirs[self.direction])
 
 
-class Food(MapObject):
+class Food(mapobject.MapObject):
     def __init__(self, points=1000, *args, **akws):
         super(Food, self).__init__(*args, **akws)
         self.points = points
@@ -145,12 +147,12 @@ class Food(MapObject):
 
 
 def load_tile(name, id_=0):
-    tree = xml.etree.ElementTree.parse(os.path.join(Project.get_instance().path, "maps", name + ".tsx"))
+    tree = xml.etree.ElementTree.parse(os.path.join(project.Project.get_instance().path, "maps", name + ".tsx"))
     image_path = tree._root[1].attrib["source"]
     image_path = image_path.replace("\\", "/")
     start = image_path.rfind("/")
     image_path = image_path[start:]
-    image = pygame.image.load(os.path.join(Project.get_instance().path, "data", "images", image_path[1:]))
+    image = pygame.image.load(os.path.join(project.Project.get_instance().path, "data", "images", image_path[1:]))
     spacing_ = int(tree._root.attrib.get("spacing", 0))
     margin = int(tree._root.attrib.get("margin", 0))
     tilewidth = int(tree._root.attrib["tilewidth"])
@@ -176,7 +178,7 @@ def load_tile(name, id_=0):
                     # frames.append(None)
                 # if not loop:
                 #    frames = frames[:-2]
-                return Animation(frames)
+                return PyTiled.animation.Animation(frames)
     im = pygame.Surface.subsurface(image, ((id_ % columns) * (tilewidth + spacing_) + spacing_,
                                            (id_ // columns) * (tileheight + margin) + margin, tilewidth, tileheight))
     return im
