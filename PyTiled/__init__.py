@@ -1,1 +1,1 @@
-__all__ = ["animation", "map", "mapobject", "project"]
+__all__ = ["animation", "map", "mapobject", "project", "utils"]

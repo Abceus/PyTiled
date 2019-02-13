@@ -30,15 +30,6 @@ class Clyde(Ghost):
         super(Clyde, self).__init__(*args, **kwargs)
 
 
-# class Layer:
-#    def __init__(self, objects=[[]], hidden=False):
-#        self.objects = objects
-#        self.hidden = hidden
-#
-#    def draw(self, surface):
-#        pass
-
-
 # class Teleport(MapObject):
 #     def touch(self, insta):
 #         insta.x = self.port_x
@@ -116,6 +107,18 @@ class Game:
             if not foods:
                 self.game_over = True
 
+    def event(self, event):
+        if event.type == pygame.KEYUP:
+            player = self.map_.get_group("player")
+            if event.key == pygame.K_LEFT:
+                player.change_direction("left")
+            elif event.key == pygame.K_RIGHT:
+                player.change_direction("right")
+            elif event.key == pygame.K_UP:
+                player.change_direction("up")
+            elif event.key == pygame.K_DOWN:
+                player.change_direction("down")
+
 
 class Pacman(mapobject.MapObject):
     def __init__(self, direction="left", *args, **akws):
@@ -125,7 +128,8 @@ class Pacman(mapobject.MapObject):
 
         self.prev_time = 0
         self.speed = 0.1
-        self.image = load_tile("function", 0)
+        self.image = utils.load_tile("function", 0)
+        # TODO: ???? if not animation - crash
         self.image.scale(self.speed)
 
     def change_direction(self, value):
@@ -144,41 +148,3 @@ class Food(mapobject.MapObject):
     def active(self, game):
         game.add_point(self.points)
         game.remove_food(self)
-
-
-def load_tile(name, id_=0):
-    tree = xml.etree.ElementTree.parse(os.path.join(project.Project.get_instance().path, "maps", name + ".tsx"))
-    image_path = tree._root[1].attrib["source"]
-    image_path = image_path.replace("\\", "/")
-    start = image_path.rfind("/")
-    image_path = image_path[start:]
-    image = pygame.image.load(os.path.join(project.Project.get_instance().path, "data", "images", image_path[1:]))
-    spacing_ = int(tree._root.attrib.get("spacing", 0))
-    margin = int(tree._root.attrib.get("margin", 0))
-    tilewidth = int(tree._root.attrib["tilewidth"])
-    tileheight = int(tree._root.attrib["tileheight"])
-    columns = int(tree._root.attrib["columns"])
-    for element in tree._root:
-        if element.tag == "tile" and int(element.attrib["id"]) == id_:
-            animation = False
-            for element2 in element:
-                if element2.tag == "animation":
-                    animation_element = element2
-                    animation = True
-            if animation:
-                frames = []
-                for f in animation_element:
-                    frames.append(pygame.Surface.subsurface(image,
-                                                            (int(f.attrib["tileid"]) % columns) *
-                                                            (tilewidth + spacing_) + spacing_,
-                                                            (int(f.attrib["tileid"]) // columns) *
-                                                            (tileheight + margin) + margin,
-                                                            tilewidth, tileheight))
-                    frames.append(float(f.attrib["duration"])/1000.0)
-                    # frames.append(None)
-                # if not loop:
-                #    frames = frames[:-2]
-                return PyTiled.animation.Animation(frames)
-    im = pygame.Surface.subsurface(image, ((id_ % columns) * (tilewidth + spacing_) + spacing_,
-                                           (id_ // columns) * (tileheight + margin) + margin, tilewidth, tileheight))
-    return im

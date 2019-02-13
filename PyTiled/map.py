@@ -1,12 +1,12 @@
 import pygame
 import sys
-import tmx
 import copy
 import inspect
 import os
 
 from PyTiled.project import Project
 from PyTiled.mapobject import MapObject
+from PyTiled.utils import load_tmx
 
 
 class Map:
@@ -18,8 +18,7 @@ class Map:
         self.groups = {}
         self.objects = []
 
-        map_ = tmx.TileMap.load(os.path.join(Project.get_instance().path, "maps", filename + ".tmx"))
-        # map_ = tmx.TileMap.load(PROJECT_PATH + "maps/" + filename + ".tmx")
+        map_ = load_tmx(os.path.join(Project.get_instance().path, "maps", filename + ".tmx"))
 
         # self.name = filename
         self.map_width = map_.width
@@ -37,8 +36,6 @@ class Map:
             image_path = ts.image.source.replace("\\", "/")
             start = image_path.rfind("/")
             image_path = image_path[start:]
-            # TODO: os.join
-            impath = os.path.join(Project.get_instance().path, "data/images")
             image = pygame.image.load(os.path.join(Project.get_instance().path, "data/images", image_path[1:]))
             spacing_ = ts.spacing
             margin = ts.margin
