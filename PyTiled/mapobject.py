@@ -19,5 +19,6 @@ class MapObject:
             surface.blit(self.image.image, (self.x*tile_width+offset[0]-tile_width/2,
                                             self.y*tile_height+offset[1]-tile_width/2))
         else:
-            surface.blit(self.image, (self.x*tile_width+offset[0]-tile_width/2,
-                                      self.y*tile_height+offset[1]-tile_width/2))
+            if self.image:
+                surface.blit(self.image, (self.x*tile_width+offset[0]-tile_width/2,
+                                          self.y*tile_height+offset[1]-tile_width/2))

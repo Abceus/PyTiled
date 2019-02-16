@@ -80,6 +80,9 @@ class SnakeHead(mapobject.MapObject):
         # ???
         self.image = utils.load_tile("main_tileset", 49)
 
+    def change_direction(self, value):
+        self.next_direction = value
+
     def draw(self, surface, tile_width, tile_height, dt, offset=(0, 0)):
         dirs = {"right": 0, "up": 90, "left": 180, "down": 270}
         super(SnakeHead, self).draw(surface, tile_width, tile_height, dt, offset, rotate=dirs[self.direction])

@@ -25,6 +25,7 @@ def load_tile(name, id_=0):
     start = image_path.rfind("/")
     image_path = image_path[start:]
     image = pygame.image.load(os.path.join(project.Project.get_instance().path, "data", "images", image_path[1:]))
+    # image = pygame.image.load(os.path.join(project.Project.get_instance().path, image_path))
     spacing_ = int(tree._root.attrib.get("spacing", 0))
     margin = int(tree._root.attrib.get("margin", 0))
     tilewidth = int(tree._root.attrib["tilewidth"])
