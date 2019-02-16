@@ -26,6 +26,11 @@ class Map:
         self.tile_width = map_.tilewidth
         self.tile_height = map_.tileheight
 
+        self.scale = 1
+        for property_ in map_.properties:
+            if property_.name == "scale":
+                self.scale = property_.value
+
         self.tiles = []
         # First tile - empty tile
         empty_object = MapObject()

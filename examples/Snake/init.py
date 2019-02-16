@@ -26,7 +26,8 @@ class Game:
             label = myfont.render("Game over", 1, (255, 0, 0))
             self.surface.blit(label, (100, 100))
 
-        s = pygame.transform.scale(self.surface, surface.get_size())
+        s = pygame.transform.scale(self.surface, (surface.get_size()[0] * self.map_.scale,
+                                                  surface.get_size()[1] * self.map_.scale))
         surface.blit(s, (0, 0))
 
     def update(self, dt):
