@@ -4,6 +4,7 @@
  <tile id="49">
   <properties>
    <property name="class_" value="SnakeHead"/>
+   <property name="direction" value="left"/>
    <property name="group" value="head"/>
   </properties>
  </tile>

@@ -20,7 +20,15 @@ def load_tile(name, id_=0):
     # TODO: fix tileset path
     tree = xml.etree.ElementTree.parse(os.path.join(project.Project.get_instance().path, "maps", name + ".tsx"))
     # check if source exists
-    image_path = tree._root[1].attrib["source"]
+    source = None
+    for node in tree._root:
+        if node.attrib["source"]:
+            source = node.attrib["source"]
+            break
+    if source is None:
+        return None
+
+    image_path = source
     image_path = image_path.replace("\\", "/")
     start = image_path.rfind("/")
     image_path = image_path[start:]

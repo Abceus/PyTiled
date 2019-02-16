@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset name="main_tileset" tilewidth="8" tileheight="8" tilecount="256" columns="16">
- <grid orientation="orthogonal" width="8" height="8"/>
  <image source="../data/images/snake.png" width="128" height="128"/>
  <tile id="49">
   <properties>
    <property name="class_" value="SnakeHead"/>
+   <property name="direction" value="left"/>
    <property name="group" value="head"/>
   </properties>
  </tile>
