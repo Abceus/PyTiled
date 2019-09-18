@@ -22,9 +22,11 @@ def load_tile(name, id_=0):
     # check if source exists
     source = None
     for node in tree._root:
-        if node.attrib["source"]:
+        try:
             source = node.attrib["source"]
             break
+        except KeyError:
+            pass
     if source is None:
         return None
 
