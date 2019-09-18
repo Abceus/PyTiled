@@ -84,8 +84,3 @@ def load_game(path):
     spec.loader.exec_module(plugin)
     project.Project.get_instance().path = path
     project.Project.get_instance().module = plugin
-    spec = importlib.util.spec_from_file_location("game", os.path.join(path, "init.py"))
-    plugin = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(plugin)
-    project.Project.get_instance().path = path
-    project.Project.get_instance().module = plugin
