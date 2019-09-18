@@ -3,6 +3,7 @@ import sys
 import pygame
 from PyTiled import *
 import os
+import shutil
 
 
 def main():
@@ -32,6 +33,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                if project.Project.get_instance().archived:
+                    shutil.rmtree(project.Project.get_instance().path)
                 sys.exit()
             game.event(event)
 

@@ -16,3 +16,4 @@ class Project:
             Project.__instance = self
             self.path = ""
             self.module = None
+            self.archived = False

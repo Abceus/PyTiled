@@ -68,6 +68,7 @@ def load_tile(name, id_=0):
 
 
 def load_game(path):
+    archived = False
     if not os.path.isdir(path):
         if os.path.splitext(path)[1] != ".pyt":
             path = path + ".pyt"
@@ -77,6 +78,7 @@ def load_game(path):
             tar.extractall(path=temp_path)
             tar.close()
             path = temp_path
+            archived = True
         else:
             raise Exception("Project don't exists")
 
@@ -85,3 +87,4 @@ def load_game(path):
     spec.loader.exec_module(plugin)
     project.Project.get_instance().path = path
     project.Project.get_instance().module = plugin
+    project.Project.get_instance().archived = archived
