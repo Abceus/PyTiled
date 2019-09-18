@@ -68,16 +68,17 @@ def load_tile(name, id_=0):
 
 
 def load_game(path):
-    if not os.path.isdir(path) and \
-            os.path.isfile(path + ".pyt") and \
-            tarfile.is_tarfile(path + ".pyt"):
-        temp_path = tempfile.mkdtemp()
-        tar = tarfile.open(path + ".pyt")
-        tar.extractall(path=temp_path)
-        tar.close()
-        path = temp_path
-    elif not os.path.isdir(path):
-        raise Exception("Project don't exists")
+    if not os.path.isdir(path):
+        if os.path.splitext(path)[1] != ".pyt":
+            path = path + ".pyt"
+        if os.path.isfile(path) and tarfile.is_tarfile(path):
+            temp_path = tempfile.mkdtemp()
+            tar = tarfile.open(path)
+            tar.extractall(path=temp_path)
+            tar.close()
+            path = temp_path
+        else:
+            raise Exception("Project don't exists")
 
     spec = importlib.util.spec_from_file_location("game", os.path.join(path, "init.py"))
     plugin = importlib.util.module_from_spec(spec)
