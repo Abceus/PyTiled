@@ -1,11 +1,11 @@
 import pygame
-from PyTiled import *
+from PyTiled import Map, MapObject, load_tile
 
 
 class Game:
     def __init__(self, mapname):
         self.points = 0
-        self.map_ = map.Map(mapname)
+        self.map_ = Map(mapname)
         self.surface = pygame.Surface((self.map_.tile_width*self.map_.map_width,
                                        self.map_.tile_height*self.map_.map_height))
         self.game_over = False
@@ -71,7 +71,7 @@ class Game:
                 player.change_direction("down")
 
 
-class SnakeHead(mapobject.MapObject):
+class SnakeHead(MapObject):
     def __init__(self, direction="left", *args, **akws):
         super(SnakeHead, self).__init__(*args, **akws)
         self.direction = direction
@@ -79,7 +79,7 @@ class SnakeHead(mapobject.MapObject):
         self.prev_time = 0
         self.speed = 0.1
         # ???
-        self.image = utils.load_tile("main_tileset", 49)
+        self.image = load_tile("main_tileset", 49)
 
     def change_direction(self, value):
         self.direction = value

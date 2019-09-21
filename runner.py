@@ -32,10 +32,10 @@ def main():
     while True:
 
         for event in pygame.event.get():
+            game.event(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            game.event(event)
 
         surface.fill((255, 255, 255))
         game.update(time.clock() - prev_time)

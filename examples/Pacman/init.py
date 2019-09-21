@@ -1,11 +1,10 @@
 import pygame
 import xml.etree
 import os
-from PyTiled import *
 import PyTiled
 
 
-class Ghost(mapobject.MapObject):
+class Ghost(PyTiled.MapObject):
     def __init__(self, *args, **kwargs):
         super(Ghost, self).__init__(*args, **kwargs)
 
@@ -39,7 +38,7 @@ class Clyde(Ghost):
 class Game:
     def __init__(self, mapname):
         self.points = 0
-        self.map_ = map.Map(mapname)
+        self.map_ = PyTiled.Map(mapname)
         self.surface = pygame.Surface((self.map_.tile_width*self.map_.map_width,
                                        self.map_.tile_height*self.map_.map_height))
         self.game_over = False
@@ -120,7 +119,7 @@ class Game:
                 player.change_direction("down")
 
 
-class Pacman(mapobject.MapObject):
+class Pacman(PyTiled.MapObject):
     def __init__(self, direction="left", *args, **akws):
         super(Pacman, self).__init__(*args, **akws)
         self.direction = direction
@@ -128,7 +127,7 @@ class Pacman(mapobject.MapObject):
 
         self.prev_time = 0
         self.speed = 0.1
-        self.image = utils.load_tile("function", 0)
+        self.image = PyTiled.utils.load_tile("function", 0)
         # TODO: ???? if not animation - crash
         self.image.scale(self.speed)
 
@@ -140,7 +139,7 @@ class Pacman(mapobject.MapObject):
         super(Pacman, self).draw(surface, tile_width, tile_height, dt, offset, rotate=dirs[self.direction])
 
 
-class Food(mapobject.MapObject):
+class Food(PyTiled.MapObject):
     def __init__(self, points=1000, *args, **akws):
         super(Food, self).__init__(*args, **akws)
         self.points = points
