@@ -2,6 +2,7 @@ import time
 import sys
 import pygame
 from PyTiled import *
+from PyTiled.project_manager import get_project_manager
 import os
 import shutil
 
@@ -11,7 +12,7 @@ def main():
         raise Exception("Pass project folder!")
 
     project_working_dir = os.path.abspath(sys.argv[1])
-    utils.load_game(project_working_dir)
+    get_project_manager().load_game(project_working_dir)
 
     pygame.init()
 
@@ -21,7 +22,7 @@ def main():
     surface = surface.convert()
     surface.fill((255, 255, 255))
 
-    game = project.Project.get_instance().module.Game("main")
+    game = get_project_manager().get_game()
 
     time.clock()
     prev_time = 0
@@ -33,8 +34,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                if project.Project.get_instance().archived:
-                    shutil.rmtree(project.Project.get_instance().path)
                 sys.exit()
             game.event(event)
 

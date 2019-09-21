@@ -6,8 +6,8 @@ import tarfile
 import tempfile
 
 
-from PyTiled import project
-import PyTiled
+from .project_manager import get_project_manager
+from .animation import Animation
 
 
 # TODO: load tmx
@@ -18,7 +18,7 @@ def load_tmx(path):
 
 def load_tile(name, id_=0):
     # TODO: fix tileset path
-    tree = xml.etree.ElementTree.parse(os.path.join(project.Project.get_instance().path, "maps", name + ".tsx"))
+    tree = xml.etree.ElementTree.parse(os.path.join(get_project_manager().path, "maps", name + ".tsx"))
     # check if source exists
     source = None
     for node in tree._root:
@@ -31,11 +31,11 @@ def load_tile(name, id_=0):
         return None
 
     image_path = source
-    image_path = image_path.replace("\\", "/")
+    image_path = os.path.normpath(image_path)
     start = image_path.rfind("/")
     image_path = image_path[start:]
-    image = pygame.image.load(os.path.join(project.Project.get_instance().path, "data", "images", image_path[1:]))
-    # image = pygame.image.load(os.path.join(project.Project.get_instance().path, image_path))
+    image = pygame.image.load(os.path.join(get_project_manager().path, "data", "images", image_path[1:]))
+    # image = pygame.image.load(os.path.join(get_project_manager().path, image_path))
     spacing_ = int(tree._root.attrib.get("spacing", 0))
     margin = int(tree._root.attrib.get("margin", 0))
     tilewidth = int(tree._root.attrib["tilewidth"])
@@ -61,30 +61,7 @@ def load_tile(name, id_=0):
                     # frames.append(None)
                 # if not loop:
                 #    frames = frames[:-2]
-                return PyTiled.animation.Animation(frames)
+                return Animation(frames)
     im = pygame.Surface.subsurface(image, ((id_ % columns) * (tilewidth + spacing_) + spacing_,
                                            (id_ // columns) * (tileheight + margin) + margin, tilewidth, tileheight))
     return im
-
-
-def load_game(path):
-    archived = False
-    if not os.path.isdir(path):
-        if os.path.splitext(path)[1] != ".pyt":
-            path = path + ".pyt"
-        if os.path.isfile(path) and tarfile.is_tarfile(path):
-            temp_path = tempfile.mkdtemp()
-            tar = tarfile.open(path)
-            tar.extractall(path=temp_path)
-            tar.close()
-            path = temp_path
-            archived = True
-        else:
-            raise Exception("Project don't exists")
-
-    spec = importlib.util.spec_from_file_location("game", os.path.join(path, "init.py"))
-    plugin = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(plugin)
-    project.Project.get_instance().path = path
-    project.Project.get_instance().module = plugin
-    project.Project.get_instance().archived = archived

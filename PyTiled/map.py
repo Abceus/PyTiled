@@ -4,9 +4,9 @@ import copy
 import inspect
 import os
 
-from PyTiled.project import Project
-from PyTiled.mapobject import MapObject
-from PyTiled.utils import load_tmx
+from .project_manager import get_project_manager
+from .mapobject import MapObject
+from .utils import load_tmx
 
 
 class Map:
@@ -18,7 +18,7 @@ class Map:
         self.groups = {}
         self.objects = []
 
-        map_ = load_tmx(os.path.join(Project.get_instance().path, "maps", filename + ".tmx"))
+        map_ = load_tmx(os.path.join(get_project_manager().path, "maps", filename + ".tmx"))
 
         # self.name = filename
         self.map_width = map_.width
@@ -41,7 +41,7 @@ class Map:
             image_path = ts.image.source.replace("\\", "/")
             start = image_path.rfind("/")
             image_path = image_path[start:]
-            image = pygame.image.load(os.path.join(Project.get_instance().path, "data/images", image_path[1:]))
+            image = pygame.image.load(os.path.join(get_project_manager().path, "data/images", image_path[1:]))
             spacing_ = ts.spacing
             margin = ts.margin
             tilewidth = ts.tilewidth
@@ -75,8 +75,8 @@ class Map:
                     if p.name == "class_":
                         if hasattr(sys.modules[__name__], p.value):
                             class_ = getattr(sys.modules[__name__], p.value)
-                        elif Project.get_instance().module and hasattr(Project.get_instance().module, p.value):
-                            class_ = getattr(Project.get_instance().module, p.value)
+                        elif get_project_manager().module and hasattr(get_project_manager().module, p.value):
+                            class_ = getattr(get_project_manager().module, p.value)
                 class_args = inspect.getfullargspec(class_).args
                 cl_args = {}
                 for p in properties:

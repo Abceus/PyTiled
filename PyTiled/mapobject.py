@@ -1,6 +1,6 @@
 import pygame
 
-from PyTiled.animation import Animation
+from .animation import Animation
 
 
 class MapObject:

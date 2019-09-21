@@ -1,4 +1,4 @@
-__all__ = ["animation", "map", "mapobject", "project", "utils"]
+__all__ = ["animation", "map", "mapobject", "project_manager", "utils"]
 
 # TODO: common base game class
 # TODO: separate tilesets
