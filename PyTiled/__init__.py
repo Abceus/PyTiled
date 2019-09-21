@@ -3,7 +3,7 @@
 from .animation import Animation
 from .mapobject import MapObject
 from .map import Map
-from .project_manager import ProjectManager
+from .project_manager import ProjectManager, get_project_manager
 from .utils import load_tmx, load_tile
 
 # TODO: common base game class

@@ -22,7 +22,7 @@ def main():
     surface = surface.convert()
     surface.fill((255, 255, 255))
 
-    game = get_project_manager().get_game()
+    project_manager = get_project_manager()
 
     time.clock()
     prev_time = 0
@@ -32,14 +32,14 @@ def main():
     while True:
 
         for event in pygame.event.get():
-            game.event(event)
+            project_manager.event(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
         surface.fill((255, 255, 255))
-        game.update(time.clock() - prev_time)
-        game.draw(surface, time.clock() - prev_time)
+        project_manager.update(time.clock() - prev_time)
+        project_manager.draw(surface, time.clock() - prev_time)
         prev_time = time.clock()
         screen.blit(surface, (0, 0))
         pygame.display.flip()

@@ -28,6 +28,7 @@ class ProjectManager:
 
     def load_game(self, path):
         archived = False
+        path = os.path.abspath(path)
         if self.archived and self.path:
             shutil.rmtree(self.path)
         self.game = None
@@ -59,6 +60,18 @@ class ProjectManager:
             return self.game
         self.game = self.module.Game("main")
         return self.game
+
+    def event(self, event):
+        if self.get_game() is not None:
+            self.get_game().event(event)
+
+    def update(self, dt):
+        if self.get_game() is not None:
+            self.get_game().update(dt)
+
+    def draw(self, surface, dt):
+        if self.get_game() is not None:
+            self.get_game().draw(surface, dt)
 
     def __del__(self):
         if self.archived and self.path:
