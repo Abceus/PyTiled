@@ -24,7 +24,6 @@ def main():
 
     project_manager = get_project_manager()
 
-    time.clock()
     prev_time = 0
 
     # pygame.key.set_repeat(1, 40)
@@ -38,9 +37,11 @@ def main():
                 sys.exit()
 
         surface.fill((255, 255, 255))
-        project_manager.update(time.clock() - prev_time)
-        project_manager.draw(surface, time.clock() - prev_time)
-        prev_time = time.clock()
+        current_time = time.perf_counter()
+        dt = current_time - prev_time
+        project_manager.update(dt)
+        project_manager.draw(surface, dt)
+        prev_time = current_time
         screen.blit(surface, (0, 0))
         pygame.display.flip()
         pygame.display.update()

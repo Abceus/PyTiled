@@ -31,10 +31,8 @@ def load_tile(name, id_=0):
         return None
 
     image_path = source
-    image_path = os.path.normpath(image_path)
-    start = image_path.rfind("/")
-    image_path = image_path[start:]
-    image = pygame.image.load(os.path.join(get_project_manager().path, "data", "images", image_path[1:]))
+    image_path = os.path.basename(image_path)
+    image = pygame.image.load(os.path.join(get_project_manager().path, "data", "images", image_path))
     # image = pygame.image.load(os.path.join(get_project_manager().path, image_path))
     spacing_ = int(tree._root.attrib.get("spacing", 0))
     margin = int(tree._root.attrib.get("margin", 0))
